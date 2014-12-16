@@ -2,9 +2,12 @@
 using Microsoft.AspNet.Identity.Dapper.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
+using System.Data;
 
 namespace Microsoft.AspNet.Identity.Dapper
 {
@@ -12,14 +15,21 @@ namespace Microsoft.AspNet.Identity.Dapper
     public class UserStore<TUser> : UserStore<TUser, int>
         where TUser : class, IIdentityUser<int, IdentityUserLogin<int>, IdentityUserRole<int>, IdentityUserClaim<int>>
     {
+        public UserStore(string connectionString)
+            : base(connectionString)
+        {
 
+        }
     }
 
     public class UserStore<TUser, TKey> : UserStore<TUser, IdentityRole<TKey, IdentityUserRole<TKey>>, TKey, IdentityUserLogin<TKey>, IdentityUserRole<TKey>, IdentityUserClaim<TKey>>
-        where TUser : class, IIdentityUser<TKey,IdentityUserLogin<TKey>,IdentityUserRole<TKey>,IdentityUserClaim<TKey>>
+        where TUser : class, IIdentityUser<TKey, IdentityUserLogin<TKey>, IdentityUserRole<TKey>, IdentityUserClaim<TKey>>
         where TKey : System.IEquatable<TKey>
     {
+        public UserStore(string connectionString) : base(connectionString)
+        {
 
+        }
     }
 
     public class UserStore<TUser, TRole, TUserKey, TUserLogin, TUserRole, TUserClaim> :
@@ -42,6 +52,22 @@ namespace Microsoft.AspNet.Identity.Dapper
         where TUserRole : IIdentityUserRole<TUserKey>, new()
         where TUserClaim : IIdentityUserClaim<TUserKey>, new()
     {
+        public string ConnectionString { get; private set; }
+
+        public UserStore(string connectionString)
+        {
+            ConnectionString = connectionString;
+        }
+
+        private SqlConnection connection;
+
+        public SqlConnection Connection
+        {
+            get { return connection ?? (connection = new SqlConnection(ConnectionString)); }
+            set { connection = value; }
+        }
+
+
         public Task AddLoginAsync(TUser user, UserLoginInfo login)
         {
             throw new NotImplementedException();
@@ -74,12 +100,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<TUser> FindByIdAsync(TUserKey userId)
         {
-            throw new NotImplementedException();
+            return findAsync(new IdentityUserQuery<TUserKey> { UserId = userId });
         }
 
         public Task<TUser> FindByNameAsync(string userName)
         {
-            throw new NotImplementedException();
+            return findAsync(new IdentityUserQuery<TUserKey> { UserName = userName });
         }
 
         public Task UpdateAsync(TUser user)
@@ -139,7 +165,13 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task SetPasswordHashAsync(TUser user, string passwordHash)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            user.PasswordHash = passwordHash;
+            return Task.FromResult(0);
         }
 
         public Task<string> GetSecurityStampAsync(TUser user)
@@ -149,7 +181,13 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task SetSecurityStampAsync(TUser user, string stamp)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            user.SecurityStamp = stamp;
+            return Task.FromResult(0);
         }
 
         public IQueryable<TUser> Users
@@ -157,9 +195,28 @@ namespace Microsoft.AspNet.Identity.Dapper
             get { throw new NotImplementedException(); }
         }
 
+        private Task<TUser> findAsync(IdentityUserQuery<TUserKey> query)
+        {
+            TUser user;
+            using(Connection)
+            {
+                using (var result = Connection.QueryMultiple("GetUser", query, commandType: CommandType.StoredProcedure))
+                {
+                    user = result.Read<TUser>().FirstOrDefault();
+                    if (user != null)
+                    {
+                        user.Roles = result.Read<TUserRole>().ToList();
+                        user.Logins = result.Read<TUserLogin>().ToList();
+                        user.Claims = result.Read<TUserClaim>().ToList();
+                    }
+                }
+            }
+            return Task.FromResult(user);
+        }
+
         public Task<TUser> FindByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            return findAsync(new IdentityUserQuery<TUserKey> { Email = email });
         }
 
         public Task<string> GetEmailAsync(TUser user)
@@ -245,6 +302,10 @@ namespace Microsoft.AspNet.Identity.Dapper
         public Task SetLockoutEndDateAsync(TUser user, DateTimeOffset lockoutEnd)
         {
             throw new NotImplementedException();
+        }
+
+        private void ThrowIfDisposed()
+        {
         }
     }
 }

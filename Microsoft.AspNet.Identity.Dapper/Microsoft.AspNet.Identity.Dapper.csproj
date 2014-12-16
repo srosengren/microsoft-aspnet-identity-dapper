@@ -54,6 +54,7 @@
     <Compile Include="Models\IdentityUser.cs" />
     <Compile Include="Models\IdentityUserClaim.cs" />
     <Compile Include="Models\IdentityUserLogin.cs" />
+    <Compile Include="Models\IdentityUserQuery.cs" />
     <Compile Include="Models\IdentityUserRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserStore.cs" />

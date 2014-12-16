@@ -10,6 +10,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using WebTemplate.Models;
 using Microsoft.AspNet.Identity.Dapper;
+using System.Configuration;
 
 namespace WebTemplate
 {
@@ -41,7 +42,7 @@ namespace WebTemplate
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
         {
-            var manager = new ApplicationUserManager(new UserStore<ApplicationUser>());
+            var manager = new ApplicationUserManager(new UserStore<ApplicationUser>(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString));
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<ApplicationUser,int>(manager)
             {

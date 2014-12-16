@@ -66,5 +66,6 @@
     <Build Include="Tables\IdentityUserRole.sql" />
     <Build Include="Tables\IdentityRole.sql" />
     <Build Include="Tables\IdentityUserLogin.sql" />
+    <Build Include="StoredProcedures\GetUser.sql" />
   </ItemGroup>
 </Project>
