@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity.Dapper.Contracts;
+using Microsoft.AspNet.Identity.Dapper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,20 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.Identity.Dapper
 {
+
+    public class UserStore<TUser> : UserStore<TUser, int>
+        where TUser : class, IIdentityUser<int, IdentityUserLogin<int>, IdentityUserRole<int>, IdentityUserClaim<int>>
+    {
+
+    }
+
+    public class UserStore<TUser, TKey> : UserStore<TUser, IdentityRole<TKey, IdentityUserRole<TKey>>, TKey, IdentityUserLogin<TKey>, IdentityUserRole<TKey>, IdentityUserClaim<TKey>>
+        where TUser : class, IIdentityUser<TKey,IdentityUserLogin<TKey>,IdentityUserRole<TKey>,IdentityUserClaim<TKey>>
+        where TKey : System.IEquatable<TKey>
+    {
+
+    }
+
     public class UserStore<TUser, TRole, TUserKey, TUserLogin, TUserRole, TUserClaim> :
         IUserLoginStore<TUser, TUserKey>,
         IUserClaimStore<TUser, TUserKey>,

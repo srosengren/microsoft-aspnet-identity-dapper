@@ -7,6 +7,16 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.Identity.Dapper.Models
 {
+    public class IdentityUser : IdentityUser<int>
+    {
+
+    }
+
+    public class IdentityUser<TKey> : IdentityUser<TKey,IdentityUserLogin<TKey>,IdentityUserRole<TKey>,IdentityUserClaim<TKey>>
+    {
+
+    }
+
     public class IdentityUser<TKey, TLogin, TRole, TClaim> : IIdentityUser<TKey, TLogin, TRole, TClaim>
         where TLogin : IIdentityUserLogin<TKey>
         where TRole : IIdentityUserRole<TKey>

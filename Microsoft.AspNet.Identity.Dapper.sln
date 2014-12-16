@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTemplate", "WebTemplate\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.Identity.Dapper", "Microsoft.AspNet.Identity.Dapper\Microsoft.AspNet.Identity.Dapper.csproj", "{F4BF9E02-FAD9-4CDD-B9FB-80DE80996CF8}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Microsoft.AspNet.Identity.Database", "Microsoft.AspNet.Identity.Database\Microsoft.AspNet.Identity.Database.sqlproj", "{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,12 @@ Global
 		{F4BF9E02-FAD9-4CDD-B9FB-80DE80996CF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4BF9E02-FAD9-4CDD-B9FB-80DE80996CF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4BF9E02-FAD9-4CDD-B9FB-80DE80996CF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5287A69-CBAD-4F5E-88B2-BE6E8897C8BA}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
