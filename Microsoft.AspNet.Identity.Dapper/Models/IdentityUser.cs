@@ -22,6 +22,14 @@ namespace Microsoft.AspNet.Identity.Dapper.Models
         where TRole : IIdentityUserRole<TKey>
         where TClaim : IIdentityUserClaim<TKey>
     {
+
+        public IdentityUser()
+        {
+            Claims = new List<TClaim>();
+            Logins = new List<TLogin>();
+            Roles = new List<TRole>();
+        }
+
         // Summary:
         //     Used to record failures for the purposes of lockout
         public virtual int AccessFailedCount { get; set; }

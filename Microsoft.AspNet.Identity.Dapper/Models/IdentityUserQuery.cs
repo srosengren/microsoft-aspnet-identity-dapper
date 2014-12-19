@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.AspNet.Identity.Dapper.Models
 {
-    internal class IdentityUserQuery<TKey>
+    internal class IdentityUserQuery<TKey> 
     {
         public TKey UserId { get; set; }
         public string UserName { get; set; }

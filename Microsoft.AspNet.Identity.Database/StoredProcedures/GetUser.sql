@@ -4,7 +4,7 @@
 	@Email NVARCHAR(256) = NULL
 AS
 
-IF @UserId IS NULL
+IF @UserId IS NULL OR @UserId = 0
 BEGIN
 	SET @UserId = (
 		SELECT u.Id 
@@ -24,7 +24,8 @@ SELECT
 	u.[PhoneNumberConfirmed],
 	u.[SecurityStamp],
 	u.[TwoFactorEnabled],
-	u.u.[UserName]
+	u.[UserName],
+	u.PasswordHash --Needed only for login
 FROM
 	IdentityUser u
 WHERE

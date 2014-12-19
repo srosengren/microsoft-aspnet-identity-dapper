@@ -11,6 +11,8 @@ namespace Microsoft.AspNet.Identity.Dapper.Contracts
         where TRole : IIdentityUserRole<TKey>
         where TClaim : IIdentityUserClaim<TKey>
     {
+        new TKey Id { get; set; }
+
         int AccessFailedCount { get; set; }
         //
         // Summary:

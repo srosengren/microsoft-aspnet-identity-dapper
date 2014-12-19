@@ -67,5 +67,9 @@
     <Build Include="Tables\IdentityRole.sql" />
     <Build Include="Tables\IdentityUserLogin.sql" />
     <Build Include="StoredProcedures\GetUser.sql" />
+    <Build Include="StoredProcedures\CreateUser.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Microsoft.AspNet.Identity.Database.publish.xml" />
   </ItemGroup>
 </Project>

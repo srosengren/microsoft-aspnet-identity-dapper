@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data;
+using System.Security.Claims;
 
 namespace Microsoft.AspNet.Identity.Dapper
 {
@@ -26,7 +27,8 @@ namespace Microsoft.AspNet.Identity.Dapper
         where TUser : class, IIdentityUser<TKey, IdentityUserLogin<TKey>, IdentityUserRole<TKey>, IdentityUserClaim<TKey>>
         where TKey : System.IEquatable<TKey>
     {
-        public UserStore(string connectionString) : base(connectionString)
+        public UserStore(string connectionString)
+            : base(connectionString)
         {
 
         }
@@ -90,7 +92,10 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task CreateAsync(TUser user)
         {
-            throw new NotImplementedException();
+            var result = Connection.Query<TUserKey>("CreateUser", user, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            if (!result.Equals(default(TUserKey)))
+                user.Id = result;
+            return Task.FromResult(0);
         }
 
         public Task DeleteAsync(TUser user)
@@ -125,7 +130,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<IList<System.Security.Claims.Claim>> GetClaimsAsync(TUser user)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            return Task.FromResult<IList<Claim>>(user.Claims.Select(c => new Claim(c.ClaimType,c.ClaimValue)).ToList());
         }
 
         public Task RemoveClaimAsync(TUser user, System.Security.Claims.Claim claim)
@@ -140,7 +150,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<IList<string>> GetRolesAsync(TUser user)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            return Task.FromResult<IList<string>>(new List<string>()); //TODO: Actually implement this
         }
 
         public Task<bool> IsInRoleAsync(TUser user, string roleName)
@@ -155,7 +170,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<string> GetPasswordHashAsync(TUser user)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            return Task.FromResult(user.PasswordHash);
         }
 
         public Task<bool> HasPasswordAsync(TUser user)
@@ -176,7 +196,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<string> GetSecurityStampAsync(TUser user)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            return Task.FromResult(user.SecurityStamp);
         }
 
         public Task SetSecurityStampAsync(TUser user, string stamp)
@@ -198,17 +223,17 @@ namespace Microsoft.AspNet.Identity.Dapper
         private Task<TUser> findAsync(IdentityUserQuery<TUserKey> query)
         {
             TUser user;
-            using(Connection)
+            object dbQuery = query;
+            if (query.UserId.Equals(default(TUserKey)))//Haven't found a way to constrain this key to a nullable primitive, that's why there's this workaround.
+                dbQuery = new { UserName = query.UserName, Email = query.UserName };
+            using (var result = Connection.QueryMultiple("GetUser", (Object)dbQuery, commandType: CommandType.StoredProcedure))
             {
-                using (var result = Connection.QueryMultiple("GetUser", query, commandType: CommandType.StoredProcedure))
+                user = result.Read<TUser>().FirstOrDefault();
+                if (user != null)
                 {
-                    user = result.Read<TUser>().FirstOrDefault();
-                    if (user != null)
-                    {
-                        user.Roles = result.Read<TUserRole>().ToList();
-                        user.Logins = result.Read<TUserLogin>().ToList();
-                        user.Claims = result.Read<TUserClaim>().ToList();
-                    }
+                    user.Roles = result.Read<TUserRole>().ToList();
+                    user.Logins = result.Read<TUserLogin>().ToList();
+                    user.Claims = result.Read<TUserClaim>().ToList();
                 }
             }
             return Task.FromResult(user);
@@ -221,7 +246,7 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<string> GetEmailAsync(TUser user)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.Email);
         }
 
         public Task<bool> GetEmailConfirmedAsync(TUser user)
@@ -261,7 +286,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<bool> GetTwoFactorEnabledAsync(TUser user)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            return Task.FromResult(user.TwoFactorEnabled);
         }
 
         public Task SetTwoFactorEnabledAsync(TUser user, bool enabled)
@@ -276,7 +306,12 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task<bool> GetLockoutEnabledAsync(TUser user)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            return Task.FromResult(user.LockoutEnabled);
         }
 
         public Task<DateTimeOffset> GetLockoutEndDateAsync(TUser user)
@@ -296,7 +331,13 @@ namespace Microsoft.AspNet.Identity.Dapper
 
         public Task SetLockoutEnabledAsync(TUser user, bool enabled)
         {
-            throw new NotImplementedException();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException("user");
+            }
+            user.LockoutEnabled = enabled;
+            return Task.FromResult(0);
         }
 
         public Task SetLockoutEndDateAsync(TUser user, DateTimeOffset lockoutEnd)
